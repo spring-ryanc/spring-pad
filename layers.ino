@@ -11,8 +11,10 @@ void processLayer(int layer, int key) {
 }
 
 void layer0(int key) {
-  displayCurrentKey(0, key + 49);
   switch (key) {
+    case 2:
+      testanimate();
+      break;
     case 9:
       startscreentest();
       break;
@@ -42,6 +44,7 @@ void layer0(int key) {
       break;
     default:
       Keyboard.press(key + 65);
+      displayCurrentKey(0, key + 49);
   }
 }
 

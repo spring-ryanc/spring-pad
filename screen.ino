@@ -107,7 +107,7 @@ void startscreentest() {
     delay(500);
   }
   if (pressed) {
-    testanimate(logo_bmp, LOGO_WIDTH, LOGO_HEIGHT); // Animate bitmaps
+    testanimate(); // Animate bitmaps
   }
 }
 
@@ -262,11 +262,12 @@ void testdrawbitmap(void) {
 
 #define XPOS   0 // Indexes into the 'icons' array in function below
 #define YPOS   1
-#define DELTAY 2
+#define DELTAY 1
 
-void testanimate(const uint8_t *bitmap, uint8_t w, uint8_t h) {
-  int8_t flake, f, icons[NUMFLAKES][3];
+int8_t icons[NUMFLAKES][3];
 
+void testanimate() {
+  int8_t f;
   // Initialize 'snowflake' positions
   for (f = 0; f < NUMFLAKES; f++) {
     icons[f][XPOS]   = random(1 - LOGO_WIDTH, display.width());
@@ -280,16 +281,28 @@ void testanimate(const uint8_t *bitmap, uint8_t w, uint8_t h) {
     Serial.println(icons[f][DELTAY], DEC);
   }
 
-  for (flake = 0 ; flake < 60; flake++) { // Loop forever...
+  animate = true;
+}
+
+#define ANIMATION_DELAY 1000
+int animationDelay = ANIMATION_DELAY; // To slow down refreshB
+void runAnimation() {
+  int8_t f;
+
+  if (animationDelay++ < ANIMATION_DELAY) {
+    return;
+  }
+  animationDelay = 0;
+
+  if (animate) {
     display.clearDisplay(); // Clear the display buffer
 
     // Draw each snowflake:
     for (f = 0; f < NUMFLAKES; f++) {
-      display.drawBitmap(icons[f][XPOS], icons[f][YPOS], bitmap, w, h, SSD1306_WHITE);
+      display.drawBitmap(icons[f][XPOS], icons[f][YPOS], logo_bmp, LOGO_WIDTH, LOGO_HEIGHT, SSD1306_WHITE);
     }
 
     display.display(); // Show the display buffer on the screen
-    delay(200);        // Pause for 1/10 second
 
     // Then update coordinates of each flake...
     for (f = 0; f < NUMFLAKES; f++) {

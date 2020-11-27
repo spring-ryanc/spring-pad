@@ -26,6 +26,9 @@ const byte colPins[COLS] = {A2, 4, 5, 6, 7, 8, 9};
 boolean kbdMode = false;
 boolean pressed = false;
 
+// Animation
+boolean animate = false;
+
 // Current pad layer
 int layer = 0;
 
@@ -64,6 +67,7 @@ void loop()
 {
   kpd.scan(); // Get keyswitch statuses
   checkMode(); // Check mode switch
+  runAnimation();
 }
 
 // Key Press Handler
@@ -71,7 +75,7 @@ void keyDown (const char which)
 {
   int key = int(which) - 65;
   pressed = true;
-  drawtext(String(which));
+  animate = false;
   if (kbdMode) {
     if (key == LAYER_KEY) {
       layer = (layer + 1) % TOTAL_LAYERS;
