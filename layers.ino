@@ -13,10 +13,10 @@ void processLayer(int layer, int key) {
 void layer0(int key) {
   switch (key) {
     case 2:
-      testanimate();
+      startAnimation();
       break;
     case 9:
-      startscreentest();
+      startScreenTest();
       break;
     case 5:
       Consumer.write(MEDIA_PREVIOUS);
@@ -43,12 +43,12 @@ void layer0(int key) {
       displayCurrentKey(0, "Play/Pause");
       break;
     default:
-      Keyboard.press(key + 65);
-      displayCurrentKey(0, key + 49);
+      Keyboard.press(key + A_OFFSET);
+      displayCurrentKey(0, key + A_OFFSET);
   }
 }
 
 void layer1(int key) {
-  displayCurrentKey(0, key + 97);
-  Keyboard.press(key + 97);
+  displayCurrentKey(1, key + ONE_OFFSET);
+  Keyboard.press(key + ONE_OFFSET);
 }
