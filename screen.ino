@@ -76,13 +76,16 @@ void startAnimation() {
 
 #define ANIMATION_DELAY 2000
 int animationDelay = ANIMATION_DELAY; // To slow down refresh
+#define SCREENSAVERDELAY 20000
+int screenSaver = 0;
+
 void runAnimation() {
   if (animateState) {
     if (animationDelay++ < ANIMATION_DELAY) {
       return;
     }
     animationDelay = 0;
-    
+
     display.clearDisplay();
     for (int8_t f = 0; f < NUMFLAKES; f++) {
       display.drawBitmap(icons[f][XPOS], icons[f][YPOS], logo_bmp, LOGO_WIDTH, LOGO_HEIGHT, SSD1306_WHITE);
@@ -100,5 +103,8 @@ void runAnimation() {
         icons[f][DELTAY] = random(1, 6);
       }
     }
+  } else   if (screenSaver++ > SCREENSAVERDELAY) {
+    startAnimation();
+    screenSaver = 0;
   }
 }
