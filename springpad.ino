@@ -36,6 +36,7 @@ Keypad_Matrix kpd = Keypad_Matrix( makeKeymap (keys), rowPins, colPins, ROWS, CO
 // Current states
 boolean kbdMode = false;
 boolean animateState = false;
+int screenSaverDelay = 0;
 int layer = 0;
 
 void setup()
@@ -66,6 +67,7 @@ void keyDown (const char which)
 {
   int key = int(which) - A_OFFSET;
   animateState = false;
+  screenSaverDelay = 0;
   if (kbdMode) {
     if (key == LAYER_KEY) {
       layer = (layer + 1) % TOTAL_LAYERS;

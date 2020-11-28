@@ -23,7 +23,7 @@ void layer0(int key) {
       displayCurrentKey(0, "Previous");
       break;
     case 6:
-      Consumer.write(MEDIA_NEXT  );
+      Consumer.write(MEDIA_NEXT);
       displayCurrentKey(0, "Next");
       break;
     case 10:
@@ -31,7 +31,7 @@ void layer0(int key) {
       displayCurrentKey(0, "Vol Down");
       break;
     case 11:
-      Consumer.write(MEDIA_VOLUME_UP );
+      Consumer.write(MEDIA_VOLUME_UP);
       displayCurrentKey(0, "Vol Up");
       break;
     case 12:
@@ -49,6 +49,21 @@ void layer0(int key) {
 }
 
 void layer1(int key) {
-  displayCurrentKey(1, key + ONE_OFFSET);
-  Keyboard.press(key + ONE_OFFSET);
+  switch (key) {
+    case 6:
+      Keyboard.press(KEY_LEFT_ALT);
+      Keyboard.press("/");
+      Keyboard.press("r");
+      displayCurrentKey(1, "Rename");    
+      break;
+    case 13:
+      Keyboard.press(KEY_LEFT_CTRL);
+      Keyboard.press("/");
+      Keyboard.press("g");
+      displayCurrentKey(1, "Goto Line");
+      break;
+    default:
+      displayCurrentKey(1, key + ONE_OFFSET);
+      Keyboard.press(key + ONE_OFFSET);
+  }
 }

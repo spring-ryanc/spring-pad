@@ -77,7 +77,6 @@ void startAnimation() {
 #define ANIMATION_DELAY 2000
 int animationDelay = ANIMATION_DELAY; // To slow down refresh
 #define SCREENSAVERDELAY 20000
-int screenSaver = 0;
 
 void runAnimation() {
   if (animateState) {
@@ -103,8 +102,8 @@ void runAnimation() {
         icons[f][DELTAY] = random(1, 6);
       }
     }
-  } else   if (screenSaver++ > SCREENSAVERDELAY) {
+  } else   if (screenSaverDelay++ > SCREENSAVERDELAY) {
     startAnimation();
-    screenSaver = 0;
+    screenSaverDelay = 0;
   }
 }
