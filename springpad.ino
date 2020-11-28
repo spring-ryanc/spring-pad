@@ -84,7 +84,7 @@ void keyDown (const char which)
 void keyUp (const char which)
 {
   if (kbdMode) {
-    Keyboard.release(which);
+    Keyboard.releaseAll();
   } else {
     SerialUSB.print (F("Key up: "));
     SerialUSB.println (which);
