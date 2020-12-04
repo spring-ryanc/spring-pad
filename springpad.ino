@@ -87,8 +87,10 @@ void processEncoder() {
     if (layer == 0) {
       if (lastEncoderVal > encoderVal) {
         Consumer.write(MEDIA_VOLUME_UP);
+        displayCurrentKey(0, "Vol Up");
       } else {
         Consumer.write(MEDIA_VOLUME_DOWN);
+        displayCurrentKey(0, "Vol Down");
       }
     } else {
       displayCurrentKey(9, encoderVal);
