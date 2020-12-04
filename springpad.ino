@@ -83,13 +83,17 @@ void loop()
 void processEncoder() {
   encoderVal += encoder->getValue();
   if (encoderVal != lastEncoderVal) {
-    lastEncoderVal = encoderVal;
     resetScreenSaver();
     if (layer == 0) {
+      if (lastEncoderVal > encoderVal) {
+        Consumer.write(MEDIA_VOLUME_UP);
+      } else {
+        Consumer.write(MEDIA_VOLUME_DOWN);
+      }
+    } else {
       displayCurrentKey(9, encoderVal);
-    } else {     
-      displayCurrentKey(9, String(encoderVal));
     }
+    lastEncoderVal = encoderVal;
   }
 }
 
