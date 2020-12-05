@@ -1,4 +1,7 @@
 # spring-pad
+![image of macropad](https://github.com/spring-ryanc/spring-pad/blob/docs/docs/PXL_20201205_223118897.jpg?raw=true)
+
+https://github.com/spring-ryanc/spring-pad/blob/docs/docs/PXL_20201205_223118897.jpg
 DIY macropad based on [Spark Fun Qwiic Keyboard Explorer](https://www.sparkfun.com/products/17251) which uses a Pro Micro to process input from mechanical keys and a [rotary encoder](https://www.sparkfun.com/products/15140) I added. A small [OLED display](https://www.sparkfun.com/products/17153) is used to show information about the current key and a fun screen saver when not in use. In hindsight I would have ordered a larger screen.
 
 ## Parts List
