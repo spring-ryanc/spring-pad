@@ -1,3 +1,6 @@
+#include <ClickEncoder.h> // https://github.com/0xPIT/encoder
+#include <TimerOne.h>
+
 #include <Keypad_Matrix.h> // https://github.com/nickgammon/Keypad_Matrix
 #include "HID-Project.h"   // https://github.com/NicoHood/HID
 #include <SPI.h>
@@ -39,9 +42,22 @@ boolean animateState = false;
 int screenSaverDelay = 0;
 int layer = 0;
 
+// Rotary Encoder
+ClickEncoder *encoder;
+int16_t lastEncoderVal, encoderVal;
+
+void timerIsr() {
+  encoder->service();
+}
+
 void setup()
 {
   SerialUSB.begin(9600);
+
+  encoder = new ClickEncoder(10, 16, 14);
+  Timer1.initialize(1000);
+  Timer1.attachInterrupt(timerIsr);
+  lastEncoderVal = -1;
 
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x32
@@ -49,7 +65,7 @@ void setup()
     for (;;); // Don't proceed, loop forever
   }
   display.display();
-  
+
   kpd.begin();
   kpd.setKeyDownHandler(keyDown);
   kpd.setKeyUpHandler(keyUp);
@@ -58,16 +74,35 @@ void setup()
 
 void loop()
 {
+  processEncoder();
   kpd.scan();
   checkMode();
   runAnimation();
 }
 
+void processEncoder() {
+  encoderVal += encoder->getValue();
+  if (encoderVal != lastEncoderVal) {
+    resetScreenSaver();
+    if (layer == 0) {
+      if (lastEncoderVal > encoderVal) {
+        Consumer.write(MEDIA_VOLUME_UP);
+        displayCurrentKey(0, "Vol Up");
+      } else {
+        Consumer.write(MEDIA_VOLUME_DOWN);
+        displayCurrentKey(0, "Vol Down");
+      }
+    } else {
+      displayCurrentKey(9, encoderVal);
+    }
+    lastEncoderVal = encoderVal;
+  }
+}
+
 void keyDown (const char which)
 {
   int key = int(which) - A_OFFSET;
-  animateState = false;
-  screenSaverDelay = 0;
+  resetScreenSaver();
   if (kbdMode) {
     if (key == LAYER_KEY) {
       layer = (layer + 1) % TOTAL_LAYERS;
@@ -106,4 +141,9 @@ void checkMode() {
       Consumer.end();
     }
   }
+}
+
+void resetScreenSaver() {
+  animateState = false;
+  screenSaverDelay = 0;
 }
