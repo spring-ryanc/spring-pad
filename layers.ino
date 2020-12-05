@@ -18,6 +18,10 @@ void layer0(int key) {
     case 9:
       startScreenTest();
       break;
+    case 4:
+      System.write(SYSTEM_SLEEP);
+      displayCurrentKey(0, "Sleep");
+      break;
     case 5:
       Consumer.write(MEDIA_PREVIOUS);
       displayCurrentKey(0, "Previous");
@@ -25,6 +29,12 @@ void layer0(int key) {
     case 6:
       Consumer.write(MEDIA_NEXT);
       displayCurrentKey(0, "Next");
+      break;
+    case 7:
+      Keyboard.press(KEY_LEFT_CTRL);
+      Keyboard.press(KEY_LEFT_ALT);
+      Keyboard.press(KEY_F9);
+      displayCurrentKey(0, "Audio Output");
       break;
     case 10:
       Consumer.write(MEDIA_VOLUME_DOWN);
@@ -50,17 +60,45 @@ void layer0(int key) {
 
 void layer1(int key) {
   switch (key) {
+    case 3:
+      Keyboard.press(KEY_LEFT_ALT);
+      displayCurrentKey(1, "Rename 1");
+      break;
+    case 4:
+      Keyboard.press(KEY_LEFT_ALT);
+      Keyboard.press('r');
+      displayCurrentKey(1, "Rename 2");
+      break;
+    case 5:
+      Keyboard.press(KEY_LEFT_ALT);
+      Keyboard.press('/');
+      displayCurrentKey(1, "Rename 3");
+      break;
     case 6:
       Keyboard.press(KEY_LEFT_ALT);
-      Keyboard.press("/");
-      Keyboard.press("r");
-      displayCurrentKey(1, "Rename");    
+      Keyboard.press('/');
+      Keyboard.press('r');
+      displayCurrentKey(1, "Rename Full");
+      break;
+    case 10:
+      Keyboard.press(KEY_LEFT_CTRL);
+      displayCurrentKey(1, "Goto Line 1");
+      break;
+    case 11:
+      Keyboard.press(KEY_LEFT_CTRL);
+      Keyboard.press('g');
+      displayCurrentKey(1, "Goto Line 2");
+      break;
+    case 12:
+      Keyboard.press(KEY_LEFT_CTRL);
+      Keyboard.press('/');
+      displayCurrentKey(1, "Goto Line 3");
       break;
     case 13:
       Keyboard.press(KEY_LEFT_CTRL);
-      Keyboard.press("/");
-      Keyboard.press("g");
-      displayCurrentKey(1, "Goto Line");
+      Keyboard.press('/');
+      Keyboard.press('g');
+      displayCurrentKey(1, "Goto Line Full");
       break;
     default:
       displayCurrentKey(1, key + ONE_OFFSET);
