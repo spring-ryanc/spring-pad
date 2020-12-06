@@ -83,7 +83,7 @@ void loop()
 void processEncoder() {
   encoderVal += encoder->getValue();
   if (encoderVal != lastEncoderVal) {
-    resetScreenSaver();
+    recordEvent();
     if (layer == 0) {
       if (lastEncoderVal > encoderVal) {
         Consumer.write(MEDIA_VOLUME_UP);
@@ -97,12 +97,13 @@ void processEncoder() {
     }
     lastEncoderVal = encoderVal;
   }
+  resetScreenSaver();
 }
 
 void keyDown (const char which)
 {
+  recordEvent();
   int key = int(which) - A_OFFSET;
-  resetScreenSaver();
   if (kbdMode) {
     if (key == LAYER_KEY) {
       layer = (layer + 1) % TOTAL_LAYERS;
@@ -118,6 +119,7 @@ void keyDown (const char which)
 
 void keyUp (const char which)
 {
+  resetScreenSaver();
   if (kbdMode) {
     Keyboard.releaseAll();
   } else {
@@ -143,7 +145,14 @@ void checkMode() {
   }
 }
 
-void resetScreenSaver() {
+void recordEvent() {
   animateState = false;
-  screenSaverDelay = 0;
+  if (screenSaverDelay > 0) {
+    screenSaverDelay = 0;
+  }
+  screenSaverDelay--;
+}
+
+void resetScreenSaver() {
+  screenSaverDelay++;
 }

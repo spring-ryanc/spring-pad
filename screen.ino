@@ -102,8 +102,10 @@ void runAnimation() {
         icons[f][DELTAY] = random(1, 6);
       }
     }
-  } else   if (screenSaverDelay++ > SCREENSAVERDELAY) {
+  } else if (screenSaverDelay > SCREENSAVERDELAY) {
     startAnimation();
     screenSaverDelay = 0;
+  } else if (screenSaverDelay > 0) {
+    screenSaverDelay++; // Dont increase while key is held down
   }
 }
