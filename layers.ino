@@ -60,6 +60,11 @@ void layer0(int key) {
 
 void layer1(int key) {
   switch (key) {
+    case 5:
+      Keyboard.press(KEY_LEFT_CTRL);
+      Keyboard.press('d');
+      displayCurrentKey(1, "GVC Mic");
+      break;
     case 6:
       Keyboard.press(KEY_LEFT_ALT);
       Keyboard.press('/');
@@ -70,7 +75,7 @@ void layer1(int key) {
       Keyboard.press(KEY_LEFT_CTRL);
       Keyboard.press('/');
       Keyboard.press('g');
-      displayCurrentKey(1, "Goto Line");
+      displayCurrentKey(1, "Goto LineD");
       break;
     default:
       displayCurrentKey(1, key + ONE_OFFSET);
