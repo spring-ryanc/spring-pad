@@ -1,3 +1,7 @@
+################################################
+# https://github.com/spring-ryanc/spring-pad
+################################################
+
 #include <ClickEncoder.h> // https://github.com/0xPIT/encoder
 #include <TimerOne.h>
 
@@ -34,7 +38,7 @@ Keypad_Matrix kpd = Keypad_Matrix( makeKeymap (keys), rowPins, colPins, ROWS, CO
 #define ONE_OFFSET 49 //1
 
 #define LAYER_KEY  0
-#define TOTAL_LAYERS 2
+#define TOTAL_LAYERS 3
 
 // Current states
 boolean kbdMode = false;

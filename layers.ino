@@ -3,9 +3,11 @@ void processLayer(int layer, int key) {
     case 0:
       layer0(key);
       break;
-
     case 1:
       layer1(key);
+      break;
+    case 2:
+      layer2(key);
       break;
   }
 }
@@ -119,5 +121,29 @@ void layer1(int key) {
         key -= 100; // Reset for actual preview
       }
       displayCurrentKey(1, key + ONE_OFFSET);
+  }
+}
+
+void layer2(int key) {
+  if (kpd.isKeyDown('B')) {
+    key += 100;
+  }
+  switch (key) {
+    case 1:
+    case 101:
+      displayCurrentKey(0, "Preview");
+      break;
+    case 6:
+      Consumer.write(MEDIA_NEXT);
+    case 106:
+      displayCurrentKey(0, "Next");
+      break;
+    default:
+      if (key < 100) {
+        Keyboard.press(key);
+      } else {
+        key -= 100; // Reset for actual preview
+      }
+      displayCurrentKey(1, key);
   }
 }
