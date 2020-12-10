@@ -27,6 +27,16 @@ void layer0(int key) {
     case 102:
       displayCurrentKey(0, "Screen Saver");
       break;
+    case 3:
+      if (ledState) {
+        digitalWrite(15, LOW);
+      } else {
+        digitalWrite(15, HIGH);
+      }
+      ledState = !ledState;
+    case 103:
+      displayCurrentKey(0, "Green" + String(!ledState));
+      break;
     case 9:
       startScreenTest();
       break;
@@ -132,11 +142,6 @@ void layer2(int key) {
     case 1:
     case 101:
       displayCurrentKey(0, "Preview");
-      break;
-    case 6:
-      Consumer.write(MEDIA_NEXT);
-    case 106:
-      displayCurrentKey(0, "Next");
       break;
     default:
       if (key < 100) {
