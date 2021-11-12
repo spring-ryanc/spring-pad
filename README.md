@@ -22,3 +22,10 @@ DIY macropad based on [Spark Fun Qwiic Keyboard Explorer](https://www.sparkfun.c
   - That means the middle pin is ground which is available on the ground rail
   - D10 and D16 are available from the PCB
 - Plug in the display using the JST Qwiic connection
+
+## Software Setup
+Follow the Spark Fun setup guide found [here](https://learn.sparkfun.com/tutorials/qwiic-pro-micro-usb-c-atmega32u4-hookup-guide).
+
+- Install Arduino IDE
+- Install Windows/Mac Drivers
+- Add board to Arduino IDE board manager (with sparkfun link)
