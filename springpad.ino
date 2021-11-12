@@ -1,6 +1,6 @@
-################################################
-# https://github.com/spring-ryanc/spring-pad
-################################################
+/******************************************************
+* https://github.com/spring-ryanc/spring-pad
+/*****************************************************/
 
 #include <ClickEncoder.h> // https://github.com/0xPIT/encoder
 #include <TimerOne.h>
@@ -43,6 +43,7 @@ Keypad_Matrix kpd = Keypad_Matrix( makeKeymap (keys), rowPins, colPins, ROWS, CO
 // Current states
 boolean kbdMode = false;
 boolean animateState = false;
+boolean ledState = false;
 int screenSaverDelay = 0;
 int layer = 0;
 
@@ -74,6 +75,9 @@ void setup()
   kpd.setKeyDownHandler(keyDown);
   kpd.setKeyUpHandler(keyUp);
   pinMode(A3, INPUT_PULLUP); // TODO: find an actual use for this switch
+
+  // Green LED
+  pinMode(15, OUTPUT);
 }
 
 void loop()
