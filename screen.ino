@@ -27,7 +27,7 @@ void displayCurrentKey(int layer, String key) {
   display.clearDisplay();
 
   display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
+  display.setTextColor(SH110X_WHITE);
   display.setCursor(0, 0);
   display.println("Layer: " + String(layer));
 
@@ -42,7 +42,7 @@ void drawtext(String text) {
   display.clearDisplay();
 
   display.setTextSize(2);      // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE); // Draw white text
+  display.setTextColor(SH110X_WHITE); // Draw white text
   display.setCursor(0, 0);     // Start at top-left corner
   display.cp437(true);         // Use full 256 char 'Code Page 437' font
   display.println(text);
@@ -87,7 +87,7 @@ void runAnimation() {
 
     display.clearDisplay();
     for (int8_t f = 0; f < NUMFLAKES; f++) {
-      display.drawBitmap(icons[f][XPOS], icons[f][YPOS], logo_bmp, LOGO_WIDTH, LOGO_HEIGHT, SSD1306_WHITE);
+      display.drawBitmap(icons[f][XPOS], icons[f][YPOS], logo_bmp, LOGO_WIDTH, LOGO_HEIGHT, SH110X_WHITE);
     }
     display.display();
 
