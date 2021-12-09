@@ -1,6 +1,6 @@
 /******************************************************
-* https://github.com/spring-ryanc/spring-pad
-/*****************************************************/
+    https://github.com/spring-ryanc/spring-pad
+******************************************************/
 
 #include <ClickEncoder.h> // https://github.com/0xPIT/encoder
 #include <TimerOne.h>
@@ -9,15 +9,16 @@
 #include "HID-Project.h"   // https://github.com/NicoHood/HID
 #include <SPI.h>
 #include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include <Adafruit_GFX.h> //#include <Adafruit_SSD1306.h> //Doesnt work with 128x64 screens
+#include <Adafruit_SH110X.h>
 
 // Setup SSD1306 display connected with I2C (https://www.sparkfun.com/products/17153)
 #define OLED_RESET     4 // Reset pin
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 32 // OLED display height, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define OLED_RESET     4 // Reset pin # (or -1 if sharing Arduino reset pin)
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+Adafruit_SH1106G display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 const byte ROWS = 2;
 const byte COLS = 7;
@@ -41,7 +42,6 @@ Keypad_Matrix kpd = Keypad_Matrix( makeKeymap (keys), rowPins, colPins, ROWS, CO
 #define TOTAL_LAYERS 3
 
 // Current states
-boolean kbdMode = false;
 boolean animateState = false;
 boolean ledState = false;
 int screenSaverDelay = 0;
@@ -64,8 +64,7 @@ void setup()
   Timer1.attachInterrupt(timerIsr);
   lastEncoderVal = encoder->getValue();
 
-  // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x32
+  if (!display.begin(SCREEN_ADDRESS, true)) {
     Serial.println(F("SSD1306 allocation failed"));
     for (;;); // Don't proceed, loop forever
   }
@@ -74,17 +73,18 @@ void setup()
   kpd.begin();
   kpd.setKeyDownHandler(keyDown);
   kpd.setKeyUpHandler(keyUp);
-  pinMode(A3, INPUT_PULLUP); // TODO: find an actual use for this switch
 
   // Green LED
   pinMode(15, OUTPUT);
+
+  Keyboard.begin();
+  Consumer.end();
 }
 
 void loop()
 {
   processEncoder();
   kpd.scan();
-  checkMode();
   runAnimation();
 }
 
@@ -112,45 +112,18 @@ void keyDown (const char which)
 {
   recordEvent();
   int key = int(which) - A_OFFSET;
-  if (kbdMode) {
-    if (key == LAYER_KEY) {
-      layer = (layer + 1) % TOTAL_LAYERS;
-      displayCurrentKey(layer, "");
-      return;
-    }
-    processLayer(layer, key);
-  } else {
-    SerialUSB.print (F("Key down: "));
-    SerialUSB.println (which);
+  if (key == LAYER_KEY) {
+    layer = (layer + 1) % TOTAL_LAYERS;
+    displayCurrentKey(layer, "");
+    return;
   }
+  processLayer(layer, key);
 }
 
 void keyUp (const char which)
 {
   resetScreenSaver();
-  if (kbdMode) {
-    Keyboard.releaseAll();
-  } else {
-    SerialUSB.print (F("Key up: "));
-    SerialUSB.println (which);
-  }
-}
-
-// Check the mode switch position and change between USB-HID mode and Serial mode
-void checkMode() {
-  if (kbdMode) {
-    if (!digitalRead(A3)) {
-      kbdMode = false;
-      Keyboard.end();
-      Consumer.begin();
-    }
-  } else {
-    if (digitalRead(A3)) {
-      kbdMode = true;
-      Keyboard.begin();
-      Consumer.end();
-    }
-  }
+  Keyboard.releaseAll();
 }
 
 void recordEvent() {
