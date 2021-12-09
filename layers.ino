@@ -135,20 +135,5 @@ void layer1(int key) {
 }
 
 void layer2(int key) {
-  if (kpd.isKeyDown('B')) {
-    key += 100;
-  }
-  switch (key) {
-    case 1:
-    case 101:
-      displayCurrentKey(0, "Preview");
-      break;
-    default:
-      if (key < 100) {
-        Keyboard.press(key);
-      } else {
-        key -= 100; // Reset for actual preview
-      }
-      displayCurrentKey(1, key);
-  }
+  
 }
