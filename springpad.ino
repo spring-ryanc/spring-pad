@@ -49,7 +49,7 @@ int layer = 0;
 
 // Slide pot
 #define SIDE_PIN A3
-int current_vol = 0;
+int current_vol = -1;
 
 // Rotary Encoder
 ClickEncoder *encoder;
@@ -121,13 +121,29 @@ void processEncoder() {
 
 void processSlider() {
   int sliderValue = analogRead(SIDE_PIN);
-
   int vol = map(sliderValue, 0, 1024, 0, 100);
+  
   if (vol != current_vol) {
-    current_vol = vol;
     Serial.print("Slide Pot value: ");
     Serial.println(sliderValue);
     drawtext("Vol " + String(vol));
+    for (int i = current_vol; i > vol; i = i - 2) {
+      Consumer.write(MEDIA_VOLUME_DOWN);
+    }
+    for (int i = current_vol; i < vol; i = i + 2) {
+      Consumer.write(MEDIA_VOLUME_UP);
+    }
+    current_vol = vol;
+  }
+
+  resetScreenSaver();
+}
+
+void resetSliderVolume() {
+  int sliderValue = analogRead(SIDE_PIN);
+  int vol = map(sliderValue, 0, 1024, 0, 100);
+  if (vol != current_vol) {
+    current_vol = vol;
     for (int i = 0; i < 50; i++) {
       Consumer.write(MEDIA_VOLUME_DOWN);
     }
@@ -146,6 +162,9 @@ void keyDown (const char which)
   if (key == LAYER_KEY) {
     layer = (layer + 1) % TOTAL_LAYERS;
     displayCurrentKey(layer, "");
+    if (layer == 2) {
+      resetSliderVolume();
+    }
     return;
   }
   processLayer(layer, key);
