@@ -47,6 +47,10 @@ boolean ledState = false;
 int screenSaverDelay = 0;
 int layer = 0;
 
+// Slide pot
+#define SIDE_PIN A3
+int current_vol = 0;
+
 // Rotary Encoder
 ClickEncoder *encoder;
 int16_t lastEncoderVal, encoderVal;
@@ -77,13 +81,20 @@ void setup()
   // Green LED
   pinMode(15, OUTPUT);
 
+  // Analog input
+  pinMode(SIDE_PIN, INPUT );
+
   Keyboard.begin();
   Consumer.end();
 }
 
 void loop()
 {
-  processEncoder();
+  if (layer == 2) {
+    processSlider();
+  } else {
+    processEncoder();
+  }
   kpd.scan();
   runAnimation();
 }
@@ -105,6 +116,26 @@ void processEncoder() {
     }
     lastEncoderVal = encoderVal;
   }
+  resetScreenSaver();
+}
+
+void processSlider() {
+  int sliderValue = analogRead(SIDE_PIN);
+
+  int vol = map(sliderValue, 0, 1024, 0, 100);
+  if (vol != current_vol) {
+    current_vol = vol;
+    Serial.print("Slide Pot value: ");
+    Serial.println(sliderValue);
+    drawtext("Vol " + String(vol));
+    for (int i = 0; i < 50; i++) {
+      Consumer.write(MEDIA_VOLUME_DOWN);
+    }
+    for (int i = 0; i < (vol / 2); i++ ) {
+      Consumer.write(MEDIA_VOLUME_UP);
+    }
+  }
+
   resetScreenSaver();
 }
 
