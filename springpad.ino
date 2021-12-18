@@ -51,6 +51,11 @@ int layer = 0;
 #define SIDE_PIN A3
 int current_vol = -1;
 
+// Deej
+const int NUM_SLIDERS = 1;
+const int analogInputs[NUM_SLIDERS] = {A3};
+int analogSliderValues[NUM_SLIDERS];
+
 // Rotary Encoder
 ClickEncoder *encoder;
 int16_t lastEncoderVal, encoderVal;
@@ -83,6 +88,9 @@ void setup()
 
   // Analog input
   pinMode(SIDE_PIN, INPUT );
+  for (int i = 0; i < NUM_SLIDERS; i++) {
+    analogSliderValues[i] = map(analogRead(analogInputs[i]), 0, 1024, 0, 100);
+  }
 
   Keyboard.begin();
   Consumer.end();
@@ -92,9 +100,10 @@ void loop()
 {
   if (layer == 2) {
     processSlider();
-  } else {
-    processEncoder();
+  } else { // Deej
+    processDeej();
   }
+  processEncoder();
   kpd.scan();
   runAnimation();
 }
@@ -106,10 +115,10 @@ void processEncoder() {
     if (layer == 0) {
       if (lastEncoderVal > encoderVal) {
         Consumer.write(MEDIA_VOLUME_UP);
-        displayCurrentKey(0, "Vol Up");
+        displayCurrentKey(layer, "Vol Up");
       } else {
         Consumer.write(MEDIA_VOLUME_DOWN);
-        displayCurrentKey(0, "Vol Down");
+        displayCurrentKey(layer, "Vol Down");
       }
     } else {
       displayCurrentKey(9, encoderVal);
@@ -119,10 +128,40 @@ void processEncoder() {
   resetScreenSaver();
 }
 
+void processDeej() {
+  bool changed = false;
+  for (int i = 0; i < NUM_SLIDERS; i++) {
+    int rawVal = analogRead(analogInputs[i]);
+    int val = map(rawVal, 0, 1024, 0, 100);
+    if (abs(val - analogSliderValues[i]) > 2) {
+      analogSliderValues[i] = val;
+      changed = true;
+      displayCurrentKey(layer, "Spotify\nVol: " + String(val));
+    }
+  }
+
+  if (!changed) {
+    return;
+  }
+  recordEvent();
+  String builtString = String("");
+  for (int i = 0; i < NUM_SLIDERS; i++) {
+    int val = map(analogSliderValues[i], 0, 100, 0, 1024);
+    builtString += String(val);
+
+    if (i < NUM_SLIDERS - 1) {
+      builtString += String("|");
+    }
+  }
+
+  Serial.println(builtString);
+  resetScreenSaver();
+}
+
 void processSlider() {
   int sliderValue = analogRead(SIDE_PIN);
   int vol = map(sliderValue, 0, 1024, 0, 100);
-  
+
   if (vol != current_vol) {
     Serial.print("Slide Pot value: ");
     Serial.println(sliderValue);
@@ -134,6 +173,7 @@ void processSlider() {
       Consumer.write(MEDIA_VOLUME_UP);
     }
     current_vol = vol;
+
   }
 
   resetScreenSaver();
@@ -179,11 +219,12 @@ void keyUp (const char which)
 void recordEvent() {
   animateState = false;
   if (screenSaverDelay > 0) {
-    screenSaverDelay = 0;
+    screenSaverDelay = -1; // Turn off screen saver until event completes.
+  } else {
+    screenSaverDelay--;
   }
-  screenSaverDelay--;
 }
 
 void resetScreenSaver() {
-  screenSaverDelay++;
+  screenSaverDelay++; // Reset screen saver timer.
 }
