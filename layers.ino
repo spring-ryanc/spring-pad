@@ -65,6 +65,12 @@ void layer0(int key) {
     case 107:
       displayCurrentKey(0, "Audio Output");
       break;
+    case 8:
+      drawLogo();
+      break;
+    case 108:
+      displayCurrentKey(0, "Logo test");
+      break;
     case 10:
       Consumer.write(MEDIA_VOLUME_DOWN);
     case 110:

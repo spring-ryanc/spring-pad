@@ -136,7 +136,12 @@ void processDeej() {
     if (abs(val - analogSliderValues[i]) > 2) {
       analogSliderValues[i] = val;
       changed = true;
-      displayCurrentKey(layer, "Spotify\nVol: " + String(val));
+      displayCurrentKey(layer, "Spotify:" + String(val));
+
+      int x = map(val, 0, 100, 5, 120);
+      display.fillTriangle(5, 50, x, 50, x, 50 - map(val, 0, 100, 0, 20), SH110X_WHITE);
+      display.drawTriangle(5, 50, 120, 50, 120, 30, SH110X_WHITE);
+      display.display();
     }
   }
 
