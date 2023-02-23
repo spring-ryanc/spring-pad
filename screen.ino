@@ -133,12 +133,13 @@ void startAnimation() {
     Serial.println(icons[f][DELTAY], DEC);
   }
 
-  animateState = true;
+  screenSaverActive = true;
 }
 
 #define ANIMATION_DELAY 2000
 int animationDelay = ANIMATION_DELAY; // To slow down refresh
 #define SCREENSAVERDELAY 20000
+#define HIBERNATEDELAY 120000
 
 void drawLogo() {
   display.clearDisplay();
@@ -146,8 +147,16 @@ void drawLogo() {
   display.display();
 }
 
-void runAnimation() {
-  if (animateState) {
+void runScreenSaver() {
+  if (hibernateActive) {
+    return;
+  }
+  if (screenSaverActive) {
+    if (screenSaverDelay++ > HIBERNATEDELAY) {
+      screenSaverActive = false;
+      hibernateActive = true;
+      drawLogo();
+    }
     if (animationDelay++ < ANIMATION_DELAY) {
       return;
     }
@@ -173,7 +182,7 @@ void runAnimation() {
   } else if (screenSaverDelay > SCREENSAVERDELAY) {
     startAnimation();
     screenSaverDelay = 0;
-  } else if (screenSaverDelay > 0) {
-    screenSaverDelay++; // Dont increase while key is held down
+  } else if (screenSaverDelay > 0) { // Dont increase while key is held down
+    screenSaverDelay++;
   }
 }

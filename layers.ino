@@ -66,10 +66,9 @@ void layer0(int key) {
       displayCurrentKey(0, "Audio Output");
       break;
     case 8:
-      drawLogo();
-      break;
+      Keyboard.press(KEY_PRINTSCREEN);
     case 108:
-      displayCurrentKey(0, "Logo test");
+      displayCurrentKey(0, "Print Screen");
       break;
     case 10:
       Consumer.write(MEDIA_VOLUME_DOWN);

@@ -42,9 +42,10 @@ Keypad_Matrix kpd = Keypad_Matrix( makeKeymap (keys), rowPins, colPins, ROWS, CO
 #define TOTAL_LAYERS 3
 
 // Current states
-boolean animateState = false;
+boolean screenSaverActive = false;
+boolean hibernateActive = false;
 boolean ledState = false;
-int screenSaverDelay = 0;
+long screenSaverDelay = 0;
 int layer = 0;
 
 // Slide pot
@@ -105,7 +106,7 @@ void loop()
   }
   processEncoder();
   kpd.scan();
-  runAnimation();
+  runScreenSaver();
 }
 
 void processEncoder() {
@@ -222,7 +223,8 @@ void keyUp (const char which)
 }
 
 void recordEvent() {
-  animateState = false;
+  screenSaverActive = false;
+  hibernateActive = false;
   if (screenSaverDelay > 0) {
     screenSaverDelay = -1; // Turn off screen saver until event completes.
   } else {
