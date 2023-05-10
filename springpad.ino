@@ -51,6 +51,7 @@ int layer = 0;
 // Slide pot
 #define SIDE_PIN A3
 int current_vol = -1;
+boolean disableSlider = false;
 
 // Deej
 const int NUM_SLIDERS = 1;
@@ -99,9 +100,9 @@ void setup()
 
 void loop()
 {
-  if (layer == 2) {
+  if (layer == 2 && !disableSlider) {
     processSlider();
-  } else { // Deej
+  } else if (!disableSlider) { // Deej
     processDeej();
   }
   processEncoder();
@@ -206,6 +207,12 @@ void keyDown (const char which)
   recordEvent();
   int key = int(which) - A_OFFSET;
   if (key == LAYER_KEY) {
+    if (kpd.isKeyDown('B')) {
+      disableSlider = !disableSlider;
+      drawtext("Slider\n" + String(disableSlider ? "Off" : "On"));      
+      return;
+    }
+    
     layer = (layer + 1) % TOTAL_LAYERS;
     displayCurrentKey(layer, "");
     if (layer == 2) {

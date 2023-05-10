@@ -66,9 +66,11 @@ void layer0(int key) {
       displayCurrentKey(0, "Audio Output");
       break;
     case 8:
-      Keyboard.press(KEY_PRINTSCREEN);
+      Keyboard.press(KEY_LEFT_SHIFT);
+      Keyboard.press(KEY_LEFT_WINDOWS);
+      Keyboard.press(HID_KEYBOARD_S_AND_S);
     case 108:
-      displayCurrentKey(0, "Print Screen");
+      displayCurrentKey(0, "Print\nScreen");
       break;
     case 10:
       Consumer.write(MEDIA_VOLUME_DOWN);
