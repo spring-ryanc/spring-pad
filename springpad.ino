@@ -51,7 +51,7 @@ int layer = 0;
 // Slide pot
 #define SIDE_PIN A3
 int current_vol = -1;
-boolean disableSlider = false;
+boolean disableSlider = true;
 
 // Deej
 const int NUM_SLIDERS = 1;
