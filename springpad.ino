@@ -42,10 +42,21 @@ Keypad_Matrix kpd = Keypad_Matrix( makeKeymap (keys), rowPins, colPins, ROWS, CO
 #define TOTAL_LAYERS 3
 
 // Current states
-boolean animateState = false;
+boolean screenSaverActive = false;
+boolean hibernateActive = false;
 boolean ledState = false;
-int screenSaverDelay = 0;
+long screenSaverDelay = 0;
 int layer = 0;
+
+// Slide pot
+#define SIDE_PIN A3
+int current_vol = -1;
+boolean disableSlider = true;
+
+// Deej
+const int NUM_SLIDERS = 1;
+const int analogInputs[NUM_SLIDERS] = {A3};
+int analogSliderValues[NUM_SLIDERS];
 
 // Rotary Encoder
 ClickEncoder *encoder;
@@ -77,15 +88,26 @@ void setup()
   // Green LED
   pinMode(15, OUTPUT);
 
+  // Analog input
+  pinMode(SIDE_PIN, INPUT );
+  for (int i = 0; i < NUM_SLIDERS; i++) {
+    analogSliderValues[i] = map(analogRead(analogInputs[i]), 0, 1024, 0, 100);
+  }
+
   Keyboard.begin();
   Consumer.end();
 }
 
 void loop()
 {
+  if (layer == 2 && !disableSlider) {
+    processSlider();
+  } else if (!disableSlider) { // Deej
+    processDeej();
+  }
   processEncoder();
   kpd.scan();
-  runAnimation();
+  runScreenSaver();
 }
 
 void processEncoder() {
@@ -95,10 +117,10 @@ void processEncoder() {
     if (layer == 0) {
       if (lastEncoderVal > encoderVal) {
         Consumer.write(MEDIA_VOLUME_UP);
-        displayCurrentKey(0, "Vol Up");
+        displayCurrentKey(layer, "Vol Up");
       } else {
         Consumer.write(MEDIA_VOLUME_DOWN);
-        displayCurrentKey(0, "Vol Down");
+        displayCurrentKey(layer, "Vol Down");
       }
     } else {
       displayCurrentKey(9, encoderVal);
@@ -108,13 +130,94 @@ void processEncoder() {
   resetScreenSaver();
 }
 
+void processDeej() {
+  bool changed = false;
+  for (int i = 0; i < NUM_SLIDERS; i++) {
+    int rawVal = analogRead(analogInputs[i]);
+    int val = map(rawVal, 0, 1024, 0, 100);
+    if (abs(val - analogSliderValues[i]) > 2) {
+      analogSliderValues[i] = val;
+      changed = true;
+      displayCurrentKey(layer, "Spotify:" + String(val));
+
+      int x = map(val, 0, 100, 5, 120);
+      display.fillTriangle(5, 50, x, 50, x, 50 - map(val, 0, 100, 0, 20), SH110X_WHITE);
+      display.drawTriangle(5, 50, 120, 50, 120, 30, SH110X_WHITE);
+      display.display();
+    }
+  }
+
+  if (!changed) {
+    return;
+  }
+  recordEvent();
+  String builtString = String("");
+  for (int i = 0; i < NUM_SLIDERS; i++) {
+    int val = map(analogSliderValues[i], 0, 100, 0, 1024);
+    builtString += String(val);
+
+    if (i < NUM_SLIDERS - 1) {
+      builtString += String("|");
+    }
+  }
+
+  Serial.println(builtString);
+  resetScreenSaver();
+}
+
+void processSlider() {
+  int sliderValue = analogRead(SIDE_PIN);
+  int vol = map(sliderValue, 0, 1024, 0, 100);
+
+  if (vol != current_vol) {
+    Serial.print("Slide Pot value: ");
+    Serial.println(sliderValue);
+    drawtext("Vol " + String(vol));
+    for (int i = current_vol; i > vol; i = i - 2) {
+      Consumer.write(MEDIA_VOLUME_DOWN);
+    }
+    for (int i = current_vol; i < vol; i = i + 2) {
+      Consumer.write(MEDIA_VOLUME_UP);
+    }
+    current_vol = vol;
+
+  }
+
+  resetScreenSaver();
+}
+
+void resetSliderVolume() {
+  int sliderValue = analogRead(SIDE_PIN);
+  int vol = map(sliderValue, 0, 1024, 0, 100);
+  if (vol != current_vol) {
+    current_vol = vol;
+    for (int i = 0; i < 50; i++) {
+      Consumer.write(MEDIA_VOLUME_DOWN);
+    }
+    for (int i = 0; i < (vol / 2); i++ ) {
+      Consumer.write(MEDIA_VOLUME_UP);
+    }
+  }
+
+  resetScreenSaver();
+}
+
 void keyDown (const char which)
 {
   recordEvent();
   int key = int(which) - A_OFFSET;
   if (key == LAYER_KEY) {
+    if (kpd.isKeyDown('B')) {
+      disableSlider = !disableSlider;
+      drawtext("Slider\n" + String(disableSlider ? "Off" : "On"));      
+      return;
+    }
+    
     layer = (layer + 1) % TOTAL_LAYERS;
     displayCurrentKey(layer, "");
+    if (layer == 2) {
+      resetSliderVolume();
+    }
     return;
   }
   processLayer(layer, key);
@@ -127,13 +230,15 @@ void keyUp (const char which)
 }
 
 void recordEvent() {
-  animateState = false;
+  screenSaverActive = false;
+  hibernateActive = false;
   if (screenSaverDelay > 0) {
-    screenSaverDelay = 0;
+    screenSaverDelay = -1; // Turn off screen saver until event completes.
+  } else {
+    screenSaverDelay--;
   }
-  screenSaverDelay--;
 }
 
 void resetScreenSaver() {
-  screenSaverDelay++;
+  screenSaverDelay++; // Reset screen saver timer.
 }
