@@ -80,18 +80,21 @@ static const unsigned char PROGMEM big_logo_bmp[] =
   0x0, 0x0, 0x0, 0xf, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
 };
 
-
 void displayCurrentKey(int layer, char key) {
   displayCurrentKey(layer, String(key));
 }
 
 void displayCurrentKey(int layer, String key) {
+  displayCurrentKey(String(layer), key);
+}
+  
+void displayCurrentKey(String layer, String key) {
   display.clearDisplay();
 
   display.setTextSize(1);
   display.setTextColor(SH110X_WHITE);
   display.setCursor(0, 0);
-  display.println("Layer: " + String(layer));
+  display.println("Layer: " + layer);
 
   if (key != "") {
     display.setTextSize(2);
@@ -101,9 +104,13 @@ void displayCurrentKey(int layer, String key) {
 }
 
 void drawtext(String text) {
+  drawtext(text, 2);
+}
+
+void drawtext(String text, int size) {
   display.clearDisplay();
 
-  display.setTextSize(2);      // Normal 1:1 pixel scale
+  display.setTextSize(size);      // Normal 1:1 pixel scale
   display.setTextColor(SH110X_WHITE); // Draw white text
   display.setCursor(0, 0);     // Start at top-left corner
   display.cp437(true);         // Use full 256 char 'Code Page 437' font
@@ -140,6 +147,7 @@ void startAnimation() {
 int animationDelay = ANIMATION_DELAY; // To slow down refresh
 #define SCREENSAVERDELAY 20000
 #define HIBERNATEDELAY 120000
+#define DEADSLEEPDELAY 12000000
 
 void drawLogo() {
   display.clearDisplay();
@@ -148,7 +156,14 @@ void drawLogo() {
 }
 
 void runScreenSaver() {
+  if (deadSleepActive) {
+    return;
+  }
   if (hibernateActive) {
+    if (screenSaverDelay++ > DEADSLEEPDELAY) {
+      deadSleepActive = true;
+      display.clearDisplay();
+    }
     return;
   }
   if (screenSaverActive) {

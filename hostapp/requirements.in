@@ -1,0 +1,3 @@
+pyserial
+win32gui
+psutil
