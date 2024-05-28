@@ -44,6 +44,7 @@ Keypad_Matrix kpd = Keypad_Matrix( makeKeymap (keys), rowPins, colPins, ROWS, CO
 // Current states
 boolean screenSaverActive = false;
 boolean hibernateActive = false;
+boolean deadSleepActive = false;
 boolean ledState = false;
 long screenSaverDelay = 0;
 int layer = 0;
@@ -108,6 +109,10 @@ void loop()
   processEncoder();
   kpd.scan();
   runScreenSaver();
+  if (Serial.available()) {
+    String serial_input = Serial.readString();
+    drawtext(serial_input, 1);
+  }
 }
 
 void processEncoder() {
@@ -232,6 +237,7 @@ void keyUp (const char which)
 void recordEvent() {
   screenSaverActive = false;
   hibernateActive = false;
+  deadSleepActive = false;
   if (screenSaverDelay > 0) {
     screenSaverDelay = -1; // Turn off screen saver until event completes.
   } else {
