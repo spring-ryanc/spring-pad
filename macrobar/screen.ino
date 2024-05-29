@@ -2,6 +2,7 @@
 int animationDelay = ANIMATION_DELAY;  // To slow down refresh
 #define SCREENSAVERDELAY 600000
 #define HIBERNATEDELAY 1200000
+#define DEADSLEEPDELAY 12000000
 
 #define XPOS 0  // Indexes into the 'icons' array in function below
 #define YPOS 1
@@ -83,7 +84,15 @@ void displayCurrentKey(int layer, String key) {
 }
 
 void runScreenSaver() {
+  if (deadSleepActive) {
+    return;
+  }
   if (hibernateActive) {
+    if (screenSaverDelay++ > DEADSLEEPDELAY) {
+      deadSleepActive = true;
+      display.clearDisplay();
+      display.display();
+    }
     return;
   }
   if (screenSaverActive) {
@@ -101,6 +110,13 @@ void runScreenSaver() {
     for (int8_t f = 0; f < NUMFLAKES; f++) {
       display.drawBitmap(icons[f][XPOS], icons[f][YPOS], logo_bmp, LOGO_WIDTH, LOGO_HEIGHT,
                          SH110X_WHITE);
+    }
+    if (debugMode) {
+      display.setTextSize(1);
+      display.setTextColor(SH110X_WHITE);
+      display.setCursor(0, 0);
+      display.cp437(true);
+      display.println(screenSaverDelay);
     }
     display.display();
 

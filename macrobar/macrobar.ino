@@ -33,7 +33,9 @@ int16_t lastEncoderVal, encoderVal;
 // Current states
 boolean screenSaverActive = false;
 boolean hibernateActive = false;
+boolean deadSleepActive = false;
 boolean ledState = false;
+boolean debugMode = false;
 long screenSaverDelay = 0;
 int layer = 0;  // TODO: use or remove.
 
@@ -75,26 +77,43 @@ void loop() {
 }
 
 void processButtons() {
-  if (digitalRead(B1_PIN) == LOW) {
+  boolean b1 = digitalRead(B1_PIN) == LOW;
+  boolean b2 = digitalRead(B2_PIN) == LOW;
+  boolean b3 = digitalRead(B3_PIN) == LOW;
+  if (b1 || b2 || b3) {
+    // Wait a bit and read again to check for multiple presses.
+    delay(1000);
+    boolean b1 = b1 || digitalRead(B1_PIN) == LOW;
+    boolean b2 = b2 || digitalRead(B2_PIN) == LOW;
+    boolean b3 = b3 || digitalRead(B3_PIN) == LOW;
+  }
+
+  if (b3 && b2) {
+    Consumer.write(MEDIA_NEXT);
+    digitalWrite(RED_PIN, LOW);
+    digitalWrite(GREEN_PIN, HIGH);
+    buttonExtras("Next");
+  } else if (b1 && b2) {
+    debugMode = !debugMode;
+    buttonExtras("Debug Mode\n" + String(debugMode));
+  } else if (b3) {
+    Consumer.write(MEDIA_PLAY_PAUSE);
+    digitalWrite(RED_PIN, LOW);
+    digitalWrite(GREEN_PIN, HIGH);
+    buttonExtras("Play/Pause");
+  } else if (b1) {
     Keyboard.press(KEY_LEFT_WINDOWS);
     Keyboard.press(HID_KEYBOARD_L_AND_L);
     digitalWrite(RED_PIN, HIGH);
     digitalWrite(GREEN_PIN, HIGH);
     buttonExtras("Lock");
-  }
-  if (digitalRead(B2_PIN) == LOW) {
+  } else if (b2) {
     Keyboard.press(KEY_LEFT_SHIFT);
     Keyboard.press(KEY_LEFT_WINDOWS);
     Keyboard.press(HID_KEYBOARD_S_AND_S);
     digitalWrite(RED_PIN, HIGH);
     digitalWrite(GREEN_PIN, LOW);
     buttonExtras("Print\nScreen");
-  }
-  if (digitalRead(B3_PIN) == LOW) {
-    Consumer.write(MEDIA_PLAY_PAUSE);
-    digitalWrite(RED_PIN, LOW);
-    digitalWrite(GREEN_PIN, HIGH);
-    buttonExtras("Play/Pause");
   }
 
   Keyboard.releaseAll();
@@ -103,7 +122,7 @@ void processButtons() {
 
 void buttonExtras(String text) {
   displayCurrentKey(0, text);
-  delay(100);  // Debounce
+  delay(1000);  // Debounce
   resetScreenSaver();
   recordEvent();
   Keyboard.releaseAll();
