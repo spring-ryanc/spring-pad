@@ -74,6 +74,10 @@ void loop() {
   processEncoder();
   runScreenSaver();
   processButtons();
+  if (Serial.available()) {
+    String serial_input = Serial.readString();
+    buttonExtras(serial_input);
+  }
 }
 
 void processButtons() {
@@ -82,7 +86,7 @@ void processButtons() {
   boolean b3 = digitalRead(B3_PIN) == LOW;
   if (b1 || b2 || b3) {
     // Wait a bit and read again to check for multiple presses.
-    delay(1000);
+    delay(200);
     boolean b1 = b1 || digitalRead(B1_PIN) == LOW;
     boolean b2 = b2 || digitalRead(B2_PIN) == LOW;
     boolean b3 = b3 || digitalRead(B3_PIN) == LOW;
@@ -153,6 +157,7 @@ void processEncoder() {
 void recordEvent() {
   screenSaverActive = false;
   hibernateActive = false;
+  deadSleepActive = false;
   if (screenSaverDelay > 0) {
     screenSaverDelay = -1;  // Turn off screen saver until event completes.
   } else {

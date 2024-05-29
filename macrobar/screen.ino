@@ -2,7 +2,7 @@
 int animationDelay = ANIMATION_DELAY;  // To slow down refresh
 #define SCREENSAVERDELAY 600000
 #define HIBERNATEDELAY 1200000
-#define DEADSLEEPDELAY 12000000
+#define DEADSLEEPDELAY 120000000
 
 #define XPOS 0  // Indexes into the 'icons' array in function below
 #define YPOS 1
