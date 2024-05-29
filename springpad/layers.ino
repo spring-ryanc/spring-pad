@@ -96,7 +96,7 @@ void layer0(int key) {
       if (key < 100) {
         Keyboard.press(key + A_OFFSET);
       } else {
-        key -= 100; // Reset for actual preview
+        key -= 100;  // Reset for actual preview
       }
       displayCurrentKey(0, key + A_OFFSET);
   }
@@ -135,12 +135,10 @@ void layer1(int key) {
       if (key < 100) {
         Keyboard.press(key + ONE_OFFSET);
       } else {
-        key -= 100; // Reset for actual preview
+        key -= 100;  // Reset for actual preview
       }
       displayCurrentKey(1, key + ONE_OFFSET);
   }
 }
 
-void layer2(int key) {
-  
-}
+void layer2(int key) {}

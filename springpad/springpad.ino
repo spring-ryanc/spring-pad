@@ -2,43 +2,41 @@
     https://github.com/spring-ryanc/spring-pad
 ******************************************************/
 
-#include <ClickEncoder.h> // https://github.com/0xPIT/encoder
-#include <TimerOne.h>
-
-#include <Keypad_Matrix.h> // https://github.com/nickgammon/Keypad_Matrix
-#include "HID-Project.h"   // https://github.com/NicoHood/HID
-#include <SPI.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h> //#include <Adafruit_SSD1306.h> //Doesnt work with 128x64 screens
+#include <Adafruit_GFX.h>  //#include <Adafruit_SSD1306.h> //Doesnt work with 128x64 screens
 #include <Adafruit_SH110X.h>
+#include <ClickEncoder.h>   // https://github.com/0xPIT/encoder
+#include <Keypad_Matrix.h>  // https://github.com/nickgammon/Keypad_Matrix
+#include <SPI.h>
+#include <TimerOne.h>
+#include <Wire.h>
+
+#include "HID-Project.h"  // https://github.com/NicoHood/HID
 
 // Setup SSD1306 display connected with I2C (https://www.sparkfun.com/products/17153)
-#define OLED_RESET     4 // Reset pin
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
-#define OLED_RESET     4 // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+#define OLED_RESET 4         // Reset pin
+#define SCREEN_WIDTH 128     // OLED display width, in pixels
+#define SCREEN_HEIGHT 64     // OLED display height, in pixels
+#define OLED_RESET 4         // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS 0x3C  ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SH1106G display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 const byte ROWS = 2;
 const byte COLS = 7;
 
-const char keys[ROWS][COLS] = {
-  {'A', 'B', 'C', 'D', 'E', 'F', 'G'},
-  {'H', 'I', 'J', 'K', 'L', 'M', 'N'}
-};
+const char keys[ROWS][COLS] = {{'A', 'B', 'C', 'D', 'E', 'F', 'G'},
+                               {'H', 'I', 'J', 'K', 'L', 'M', 'N'}};
 const byte rowPins[ROWS] = {A0, A1};
 const byte colPins[COLS] = {A2, 4, 5, 6, 7, 8, 9};
 
 // Setup macropad input (https://www.sparkfun.com/products/17251)
-Keypad_Matrix kpd = Keypad_Matrix( makeKeymap (keys), rowPins, colPins, ROWS, COLS );
+Keypad_Matrix kpd = Keypad_Matrix(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 // ASCII characters
 #define A_OFFSET 65
 #define a_OFFSET 97
-#define ONE_OFFSET 49 //1
+#define ONE_OFFSET 49  // 1
 
-#define LAYER_KEY  0
+#define LAYER_KEY 0
 #define TOTAL_LAYERS 3
 
 // Current states
@@ -63,12 +61,9 @@ int analogSliderValues[NUM_SLIDERS];
 ClickEncoder *encoder;
 int16_t lastEncoderVal, encoderVal;
 
-void timerIsr() {
-  encoder->service();
-}
+void timerIsr() { encoder->service(); }
 
-void setup()
-{
+void setup() {
   SerialUSB.begin(9600);
 
   encoder = new ClickEncoder(10, 16, 14);
@@ -78,7 +73,7 @@ void setup()
 
   if (!display.begin(SCREEN_ADDRESS, true)) {
     Serial.println(F("SSD1306 allocation failed"));
-    for (;;); // Don't proceed, loop forever
+    for (;;);  // Don't proceed, loop forever
   }
   display.display();
 
@@ -90,7 +85,7 @@ void setup()
   pinMode(15, OUTPUT);
 
   // Analog input
-  pinMode(SIDE_PIN, INPUT );
+  pinMode(SIDE_PIN, INPUT);
   for (int i = 0; i < NUM_SLIDERS; i++) {
     analogSliderValues[i] = map(analogRead(analogInputs[i]), 0, 1024, 0, 100);
   }
@@ -99,11 +94,10 @@ void setup()
   Consumer.end();
 }
 
-void loop()
-{
+void loop() {
   if (layer == 2 && !disableSlider) {
     processSlider();
-  } else if (!disableSlider) { // Deej
+  } else if (!disableSlider) {  // Deej
     processDeej();
   }
   processEncoder();
@@ -185,7 +179,6 @@ void processSlider() {
       Consumer.write(MEDIA_VOLUME_UP);
     }
     current_vol = vol;
-
   }
 
   resetScreenSaver();
@@ -199,7 +192,7 @@ void resetSliderVolume() {
     for (int i = 0; i < 50; i++) {
       Consumer.write(MEDIA_VOLUME_DOWN);
     }
-    for (int i = 0; i < (vol / 2); i++ ) {
+    for (int i = 0; i < (vol / 2); i++) {
       Consumer.write(MEDIA_VOLUME_UP);
     }
   }
@@ -207,17 +200,16 @@ void resetSliderVolume() {
   resetScreenSaver();
 }
 
-void keyDown (const char which)
-{
+void keyDown(const char which) {
   recordEvent();
   int key = int(which) - A_OFFSET;
   if (key == LAYER_KEY) {
     if (kpd.isKeyDown('B')) {
       disableSlider = !disableSlider;
-      drawtext("Slider\n" + String(disableSlider ? "Off" : "On"));      
+      drawtext("Slider\n" + String(disableSlider ? "Off" : "On"));
       return;
     }
-    
+
     layer = (layer + 1) % TOTAL_LAYERS;
     displayCurrentKey(layer, "");
     if (layer == 2) {
@@ -228,8 +220,7 @@ void keyDown (const char which)
   processLayer(layer, key);
 }
 
-void keyUp (const char which)
-{
+void keyUp(const char which) {
   resetScreenSaver();
   Keyboard.releaseAll();
 }
@@ -239,12 +230,12 @@ void recordEvent() {
   hibernateActive = false;
   deadSleepActive = false;
   if (screenSaverDelay > 0) {
-    screenSaverDelay = -1; // Turn off screen saver until event completes.
+    screenSaverDelay = -1;  // Turn off screen saver until event completes.
   } else {
     screenSaverDelay--;
   }
 }
 
 void resetScreenSaver() {
-  screenSaverDelay++; // Reset screen saver timer.
+  screenSaverDelay++;  // Reset screen saver timer.
 }
