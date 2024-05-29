@@ -22,10 +22,11 @@ void layer0(int key) {
       displayCurrentKey(0, "Preview");
       break;
     case 2:
-      startAnimation();
+      debugMode = !debugMode;
+      displayText("Debug Mode = " + String(debugMode));
       break;
     case 102:
-      displayCurrentKey(0, "Screen Saver");
+      displayCurrentKey(0, "Debug Mode");
       break;
     case 3:
       if (ledState) {

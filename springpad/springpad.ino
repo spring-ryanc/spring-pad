@@ -44,6 +44,7 @@ boolean screenSaverActive = false;
 boolean hibernateActive = false;
 boolean deadSleepActive = false;
 boolean ledState = false;
+boolean debugMode = false;
 long screenSaverDelay = 0;
 int layer = 0;
 
@@ -105,7 +106,7 @@ void loop() {
   runScreenSaver();
   if (Serial.available()) {
     String serial_input = Serial.readString();
-    drawtext(serial_input, 1);
+    displayText(serial_input, 1);
   }
 }
 
@@ -171,7 +172,7 @@ void processSlider() {
   if (vol != current_vol) {
     Serial.print("Slide Pot value: ");
     Serial.println(sliderValue);
-    drawtext("Vol " + String(vol));
+    displayText("Vol " + String(vol));
     for (int i = current_vol; i > vol; i = i - 2) {
       Consumer.write(MEDIA_VOLUME_DOWN);
     }
@@ -206,7 +207,7 @@ void keyDown(const char which) {
   if (key == LAYER_KEY) {
     if (kpd.isKeyDown('B')) {
       disableSlider = !disableSlider;
-      drawtext("Slider\n" + String(disableSlider ? "Off" : "On"));
+      displayText("Slider\n" + String(disableSlider ? "Off" : "On"));
       return;
     }
 

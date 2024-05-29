@@ -74,9 +74,9 @@ void displayCurrentKey(String layer, String key) {
   display.display();
 }
 
-void drawtext(String text) { drawtext(text, 2); }
+void displayText(String text) { displayText(text, 2); }
 
-void drawtext(String text, int size) {
+void displayText(String text, int size) {
   display.clearDisplay();
 
   display.setTextSize(size);           // Normal 1:1 pixel scale
@@ -134,6 +134,7 @@ void runScreenSaver() {
     if (screenSaverDelay++ > DEADSLEEPDELAY) {
       deadSleepActive = true;
       display.clearDisplay();
+      display.display();
     }
     return;
   }
@@ -152,6 +153,13 @@ void runScreenSaver() {
     for (int8_t f = 0; f < NUMFLAKES; f++) {
       display.drawBitmap(icons[f][XPOS], icons[f][YPOS], logo_bmp, LOGO_WIDTH, LOGO_HEIGHT,
                          SH110X_WHITE);
+    }
+    if (debugMode) {
+      display.setTextSize(1);
+      display.setTextColor(SH110X_WHITE);
+      display.setCursor(0, 0);
+      display.cp437(true);
+      display.println(screenSaverDelay);
     }
     display.display();
 
