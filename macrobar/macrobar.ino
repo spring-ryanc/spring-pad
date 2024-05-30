@@ -75,8 +75,10 @@ void loop() {
   runScreenSaver();
   processButtons();
   if (Serial.available()) {
+    recordEvent();
     String serial_input = Serial.readString();
     buttonExtras(serial_input);
+    resetScreenSaver();
   }
 }
 
@@ -119,17 +121,14 @@ void processButtons() {
     digitalWrite(GREEN_PIN, LOW);
     buttonExtras("Print\nScreen");
   }
-
-  Keyboard.releaseAll();
-  resetScreenSaver();
 }
 
 void buttonExtras(String text) {
   displayCurrentKey(0, text);
   delay(1000);  // Debounce
-  resetScreenSaver();
   recordEvent();
   Keyboard.releaseAll();
+  resetScreenSaver();
 }
 
 void processEncoder() {

@@ -1,3 +1,3 @@
 pyserial
-win32gui
+pywin32
 psutil
