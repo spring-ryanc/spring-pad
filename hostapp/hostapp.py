@@ -4,10 +4,10 @@ import win32gui
 import string
 import psutil
 import win32process
+import pyaudio
 
-MAX_LINE_LENGTH = 21
+MAX_LINE_LENGTH = 10
 
-arduino = serial.Serial(port="COM5", baudrate=9600, timeout=0.1)
 titles = set()
 debug = False
 
@@ -27,7 +27,7 @@ def main():
         parts = title.split(" - ")
         artist = parts[0]
         song = parts[1]
-        write_read(song + "\n" + artist)
+        write_read(song + "\n" + artist + "\n" + get_output_device())
     else:
         print(f"Ignoring window: {title}")
 
@@ -45,6 +45,10 @@ def getWindows(hwnd, output: set):
         if debug:
             print(f"Ignoring {process_name=} {pid=} {hwnd=}")
 
+def get_output_device() -> str:
+    p = pyaudio.PyAudio()
+    device_info = p.get_default_output_device_info()
+    return device_info['name'].replace("Headphones ", "").replace("Speakers ", "").strip("() ")
 
 def prep_text(x: str):
     lines = x.split("\n")
@@ -54,7 +58,12 @@ def prep_text(x: str):
 def write_read(x: str):
     x = prep_text(x)
     print("sending: " + x)
-    arduino.write(bytes(x, "utf-8"))
+    try:
+        arduino = serial.Serial(port="COM7", baudrate=9600, timeout=0.1)
+        arduino.write(bytes(x, "utf-8"))
+        arduino.close()
+    except Exception as exc:
+        print("Failed to send: " + str(exc))
 
 
 if __name__ == "__main__":

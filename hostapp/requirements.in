@@ -1,3 +1,4 @@
 pyserial
 pywin32
 psutil
+pyaudio
